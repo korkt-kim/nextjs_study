@@ -5,7 +5,7 @@ import axios from 'axios';
 import Head from 'next/head';
 import { useEffect } from 'react';
 
-const PID = ({ item }) => {
+const PID = ({ item, name }) => {
   // title, description이 들어감으로서 검색엔진에서 사용할 수 있다.
   return (
     <>
@@ -13,6 +13,7 @@ const PID = ({ item }) => {
         <title>{item.name}</title>
         <meta name="description" content={item.description}></meta>
       </Head>
+      {name} 환경 입니다.
       {item && (
         <div>
           <p>{item?.name}</p>
@@ -35,6 +36,7 @@ export async function getServerSideProps(context) {
   return {
     props: {
       item: data,
+      name: process.env.name,
     },
   };
 }
