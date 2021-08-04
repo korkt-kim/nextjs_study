@@ -3,10 +3,25 @@
 //getServerSideProps 를 사용하여 ssr을 구현한다.
 import axios from 'axios';
 import Head from 'next/head';
-import { useEffect } from 'react';
+import { useRouter } from 'next/router';
+import { Loader } from 'semantic-ui-react';
 
 const PID = ({ item, name }) => {
   // title, description이 들어감으로서 검색엔진에서 사용할 수 있다.
+
+  const router = useRouter();
+
+  console.log(router.isFallback); // 새로고침시 true->false로 된다.
+  if (router.isFallback) {
+    return (
+      <div>
+        <Loader active inline="centered">
+          Loading
+        </Loader>
+      </div>
+    );
+  }
+
   return (
     <>
       <Head>
@@ -27,9 +42,19 @@ const PID = ({ item, name }) => {
 export default PID;
 export async function getStaticPaths() {
   // 빌드시점에 paths로 넘어온 페이지를 getStaticProps에서 동적으로 정적 HTML을 생성한다.
+  const API_URL = process.env.api_url;
+  const res = await axios.get(API_URL);
+  const data = res.data;
   return {
-    paths: [{ params: { pid: '495' } }, { params: { pid: '488' } }, { params: { pid: '477' } }],
-    fallback: false,
+    paths: data.slice(0, 9).map((item) => {
+      //상위 9개만 html만들어줌
+      return {
+        params: {
+          pid: item.id.toString(),
+        },
+      };
+    }),
+    fallback: true,
   };
 }
 
